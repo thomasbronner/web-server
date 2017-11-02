@@ -1,14 +1,4 @@
 # web-server
 
-A Clojure library designed to ... well, that part is up to you.
+Learning clojure by setting up a web server with ring,compojure, hiccup, mustache..
 
-## Usage
-
-FIXME
-
-## License
-
-Copyright © 2017 FIXME
-
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
