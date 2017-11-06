@@ -1,6 +1,7 @@
 (ns web-server.db
   "Handle all database interactions, sometime reprocessing fetched data"
-  (:require [clojure.java.jdbc :as jdbc]))
+  (:require [clojure.java.jdbc :as jdbc]
+            [web-server.util :refer :all]))
 
 
 
@@ -52,8 +53,18 @@
 (def rs-skill-types (jdbc/query db ["select * from cv.skill_type order by relevance"]))
 
 (defn rs-skills-of-types "fetch skills correspondint to skill type, support :all keyword" [type-ids]
-  (if (or (nil? type-ids) (= type-ids []))
+  (if (or (nil? type-ids) (empty? type-ids))
     '()
-    (if (= type-ids :all)
-      (jdbc/query db ["select id_skill,name,version,mastery from cv.skill order by mastery desc"])
-      (jdbc/query db [(str "select id_skill,name,version,mastery from cv.skill where id_skill_type in (" (clojure.string/join "," type-ids) ") order by mastery desc")]))))
+    (let [sql (if  (or (some #(= :all %) type-ids) (and (= 1 (count type-ids)) (nil? (first type-ids))))
+                "select id_skill,name,version,mastery from cv.skill order by mastery desc"
+                (str "select id_skill,name,version,mastery from cv.skill where id_skill_type in (" (clojure.string/join "," type-ids) ") order by mastery desc"))]
+      (jdbc/query db [sql]))))
+
+(defn rs-skills-containing "fetch skills whose name contains any keywords. Expects a collection" [key-words]
+  (if (or (not (coll? key-words)) (empty? key-words))
+    '()
+    (flatten (map
+               (fn [key-word] (jdbc/query db [(str "select id_skill,name,version,mastery from cv.skill where lower(name) like '%" (clojure.string/lower-case key-word) "%';")]))
+               key-words))))
+
+;(use 'web-server.util :reload)

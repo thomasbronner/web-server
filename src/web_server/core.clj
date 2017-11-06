@@ -5,6 +5,7 @@
     [compojure.route :refer :all]
     [clostache.parser :refer :all]
     [web-server.html :refer :all]
+    [web-server.util :refer :all]
     ))
 
 (defn read-template  "take a filename (with no extension) and read that file from /resources/templates"  [template-name]
@@ -14,40 +15,35 @@
 (defn render-template  "take a template file and a parameter map, and render it"  [template-file params]
   (render (read-template template-file) params))
 
-(def vec-pattern #"\[.*\]")
-
-(defn vectorize-string "convert params in vector, ex \"[\"1\" \"2\"]\" => [1 2] " [string]
-  (if (nil? string)
-    []
-    (read-string(
-                  str "["
-                  (-> string
-                      (clojure.string/replace "[" "")
-                      (clojure.string/replace "]" "")
-                      (clojure.string/replace "\"" "")
-                      )"]"))))
-
 ;when using directly html, use {{{ ... }}} in template instead of {{ ... }}
-(defn index  "read and render template index.mustache"  [params]
-  (let [skill-type-vector (vectorize-string (get params "skill-type-ids"))]
-    (render-template "index" {:education education-table-html
-                              :clients client-table-with-logo-html
-                              :salariat employer-html
-                              :contact contact-html
-                              :skill-type (cond ;relay the button used to the form generating function
-                                            (contains? params select-all-skills) (skill-type-form-html skill-type-vector :all)
-                                            (contains? params select-none-skills) (skill-type-form-html skill-type-vector :none)
-                                            :else (skill-type-form-html skill-type-vector))
-                              :skill-detail (cond ;relay the button used
+(defn index  "read and render template index.mustache"
+  ([] (index nil))
+  ([params]
+   (let [skill-type-ids    (parse-for-int (get params "skill-type-ids"))
+         tech-names        (split-search-string (get params "tech-names"))]
+     (render-template "index" {:education education-table-html
+                               :clients client-table-with-logo-html
+                               :salariat employer-html
+                               :freelance "<strong>TODO</strong>"
+                               :contact contact-html
+
+                               :skill-type (cond ;relay the button used to the form generating function
+                                             (contains? params select-all-skills) (skill-type-form-html skill-type-ids :all)
+                                             (contains? params select-none-skills) (skill-type-form-html skill-type-ids :none)
+                                             :else (skill-type-form-html skill-type-ids))
+
+                               :skill-detail (cond ;relay the button used
                                                (contains? params select-all-skills) (skills-of-types-html :all)
-                                              (contains? params select-none-skills) (skills-of-types-html :none)
-                                              :else(skills-of-types-html skill-type-vector))
-                              })))
+                                               (contains? params select-none-skills) (skills-of-types-html :none)
+                                               :else (skills-of-types-html skill-type-ids))
+
+                               :skill-search-result (skills-containing-html tech-names)
+                               }))))
 
 (defroutes webapp
-  (GET "/" [] (index {:skill-type-ids nil})) ;renvoie le template mustache "index", généré
+  (GET "/" [] (index)) ;renvoie le template mustache "index", généré
   ;(POST "/" request (str request)) ;pour voir la requete
-  ;(POST "/" [& params] (str params)) ;pour voir les param
+  ;(POST "/" [& params] (str params " string? params ="(string? params) " coll? params ="(coll? params)  )) ;pour voir les param
   (POST "/" [& params] (index params)); put all params in a map<String,String>
   (resources "/"); fait pointer / dans html vers /resources/public du serveur. Pour les ressources static comme le css
   (not-found "404 Not Found"))
@@ -61,6 +57,7 @@
 
 
 ;(use 'web-server.html :reload)
+;(use 'web-server.util :reload)
 
 
 
