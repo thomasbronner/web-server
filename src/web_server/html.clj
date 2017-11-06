@@ -101,8 +101,18 @@
     db/rs-salariat-tasks)))
 
 ;skills
-(defn skill-type-form-html "form for hiccup with selected checkboxes as parameters" [ids]
-  (html [:form {:class "pure-form pure-form-aligned" :method "post"}
+
+(def display-selected-skills "display-selected-skills")
+(def select-none-skills "select-none-skills")
+(def select-all-skills "select-all-skills")
+
+(defn skill-type-form-html "form for hiccup with selected checkboxes as parameters
+  ids : skill type ids collection to retain checked checkbox
+  all-none : :all to check all checkboxes, :none to uncheck all checkboxes
+  "
+  ([ids] (skill-type-form-html ids nil))
+  ([ids all-none]
+   (html [:form {:class "pure-form pure-form-aligned" :method "post"}
          ((fn [input]
             (loop [[line & remain] input
                    result [:fieldset]
@@ -113,15 +123,19 @@
                    attrib {:type "checkbox" :id (str "name" counter) :name "skill-type-ids" :value id}]
                 (if (nil? line) ;; put the buttons at the end
                   (-> result
-                    (conj [:button {:type "submit" :class "pure-button pure-button-primary" :name "display"} "Afficher"])
-                     (conj [:button {:type "submit" :class "pure-button pure-button-primary" :name "select-all-none"} "Tout/rien"]))
+                    (conj [:button {:type "submit" :class "pure-button pure-button-primary" :name display-selected-skills } "Afficher"])
+                    (conj [:button {:type "submit" :class "pure-button pure-button-primary" :name select-all-skills } "Tout"])
+                    (conj [:button {:type "submit" :class "pure-button pure-button-primary" :name select-none-skills } "Rien"]))
                   (recur remain
                          [:div {:class "pure-control-group"}
                           (-> result
                               ;input
                               (conj
-                                ;set checked if id is part of ids
-                                (if (some #(= id %) ids) ;TODO marche pas
+                                ;set checked if id is part of ids, considering :all or :none in all-none
+                                (if (cond
+                                      (= all-none :all) true ; all checked
+                                      (= all-none :none ) false; none checked
+                                      (some #(= id %) ids) true) ;look in provided ids
                                   [:input (assoc attrib :checked true)]
                                   [:input attrib]))
                               ;label for input + tooltip
@@ -130,23 +144,22 @@
                          (inc counter)
                          )
                   ))))
-          db/rs-skill-types)]))
+          db/rs-skill-types)])))
 
-(defn skills-of-types-html "fetch skills corresponding to skill type ids and format for hiccup" [ids]
-  (if-not (or (nil? ids) (and (coll? ids) (empty? ids)))
-    (str
-      ;;(html [:h3 {:class "content-subhead"} "Détail"])
-      (html [:table {:class "pure-table"}
-             [:thead [:tr [:th "Technologie"] [:th "Version"] [:th "Maîtrise"[:a {:href "#mastery"} " * "] ] ]]
-             [:tbody
-              (map
-                (fn [line]
-                  (let [tech (:name line)
-                        version (:version line)
-                        mastery (:mastery line)]
-                    [:tr [:td tech] [:td version] [:td (str mastery " %")] ]
-                    ))
-                (db/rs-skills-of-types ids))]]))))
+(defn skills-of-types-html "fetch skills corresponding to skill type ids and format for hiccup, accept :all or :none " [ids]
+  (if (or (nil? ids) (= ids :none) (and (coll? ids) (empty? ids)))
+    nil
+    (html [:table {:class "pure-table"}
+           [:thead [:tr [:th "Technologie"] [:th "Version"] [:th "Maîtrise"[:a {:href "#mastery"} " * "] ] ]]
+           [:tbody
+            (map
+              (fn [line]
+                (let [tech (:name line)
+                      version (:version line)
+                      mastery (:mastery line)]
+                  [:tr [:td tech] [:td version] [:td (str mastery " %")] ]
+                  ))
+              (db/rs-skills-of-types ids))]])))
 
 
 ;(use 'web-server.db :reload)

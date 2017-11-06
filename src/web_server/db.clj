@@ -49,9 +49,11 @@
     rs-salariat))
 
 
-(def rs-skill-types (jdbc/query db ["select * from cv.skill_type"]))
+(def rs-skill-types (jdbc/query db ["select * from cv.skill_type order by relevance"]))
 
-(defn rs-skills-of-types "fetch skills correspondint to skill type" [type-ids]
+(defn rs-skills-of-types "fetch skills correspondint to skill type, support :all keyword" [type-ids]
   (if (or (nil? type-ids) (= type-ids []))
     '()
-  (jdbc/query db [(str "select id_skill,name,version,mastery from cv.skill where id_skill_type in (" (clojure.string/join "," type-ids) ")")])))
+    (if (= type-ids :all)
+      (jdbc/query db ["select id_skill,name,version,mastery from cv.skill order by mastery desc"])
+      (jdbc/query db [(str "select id_skill,name,version,mastery from cv.skill where id_skill_type in (" (clojure.string/join "," type-ids) ") order by mastery desc")]))))
