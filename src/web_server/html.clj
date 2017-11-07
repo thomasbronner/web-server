@@ -110,7 +110,7 @@
   ([ids] (skill-type-form-html ids nil))
   ([ids all-none]
    (let [ids (vectorize ids)]
-     (html [:form {:class "pure-form pure-form-aligned" :method "post"}
+     (html [:form {:class "pure-form pure-form-aligned" :method "post" :action "/#skill-type-form" :id "skill-type-form"}
             ((fn [input]
                (loop [[line & remain] input
                       result [:fieldset]
@@ -121,9 +121,9 @@
                       attrib {:type "checkbox" :id (str "name" counter) :name "skill-type-ids" :value id}]
                    (if (nil? line) ;; put the buttons at the end
                      (-> result
-                         (conj [:button {:type "submit" :class "pure-button pure-button-primary" :name display-selected-skills } "Afficher"])
-                         (conj [:button {:type "submit" :class "pure-button pure-button-primary" :name select-all-skills } "Tout"])
-                         (conj [:button {:type "submit" :class "pure-button pure-button-primary" :name select-none-skills } "Rien"]))
+                         (conj [:button {:type "submit" :class "pure-button" :name display-selected-skills } "Afficher"])
+                         (conj [:button {:type "submit" :class "pure-button" :name select-all-skills } "Tout"])
+                         (conj [:button {:type "submit" :class "pure-button" :name select-none-skills } "Rien"]))
                      (recur remain
                             [:div {:class "pure-control-group"}
                              (-> result

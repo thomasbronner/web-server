@@ -4,9 +4,9 @@
 }
 
 .button {
-	color: white;
+	color: #191818;
 	border-radius: 4px;
-	background: rgb(211, 211, 211);
+	background: #DCDCDC;
 	margin-right: 0.5em;
 	margin-bottom:0.5em;
 	text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
@@ -22,11 +22,12 @@
 /* Tooltip text */
 .tooltip .tooltiptext {
     visibility: hidden;
-    background-color: grey;
-    color: #fff;
+    background-color: #D3D3D3;
+    color: black;
     text-align: center;
     padding: 5px;
     border-radius: 6px;
+    width: 10em;
 
     /* Position the tooltip text */
     position: absolute;

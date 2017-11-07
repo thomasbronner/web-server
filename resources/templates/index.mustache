@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="A layout example with a side menu that hides on mobile, just like the Pure website.">
-    <title>Responsive Side Menu &ndash; Layout Examples &ndash; Pure</title>
+    <meta name="description" content="Thomas Bronner's CV">
+    <title>Thomas Bronner, analyse programmeur indépendant</title>
 
     <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-" crossorigin="anonymous">
 
@@ -31,21 +31,25 @@
           <!-- 					<a class="pure-menu-heading" href="#">Company</a> -->
 
           <ul class="pure-menu-list">
-            <li class="pure-menu-item"><a href="#" class="pure-menu-link">Home</a></li>
-            <li class="pure-menu-item"><a href="#" class="pure-menu-link">TODO</a></li>
-
-            <li class="pure-menu-item" class="menu-item-divided pure-menu-selected">
-              <a href="#" class="pure-menu-link">TODO</a>
+            <li>TODO english version</li>
+            <li class="pure-menu-item">
+              <a href="#title" class="pure-menu-link">
+                <img src="/img/fr.png" style="width:1.5em; margin-right:1em" alt="Français"/>
+                <img src="/img/en-us.png" style="width:1.5em; margin-right:1em" alt="English"/>
+              </a>
             </li>
-
+            <li class="pure-menu-item"><a href="#title" class="pure-menu-link">Présentation</a></li>
+            <li class="pure-menu-item"><a href="#skills" class="pure-menu-link">Compétences</a></li>
             <li class="pure-menu-item"><a href="#contact" class="pure-menu-link">Contact</a></li>
+            <li class="pure-menu-item"><a href="#ref-client" class="pure-menu-link">Références</a></li>
+            <li class="pure-menu-item"><a href="#experience" class="pure-menu-link">Expérience</a></li>
           </ul>
         </div>
       </div>
 
       <div id="main">
 
-        <div class="header">
+        <div class="header" id="title">
           <div class="pure-g">
             <div class="pure-u-1-5">
               <img src="/img/face.jpg" alt="Smiley face"
@@ -67,21 +71,20 @@
           <p>J'étudie tout projet réalisable <strong>en télétravail</strong>, en particulier dans l'informatique scientifique.</p>
           <p>Outre une culture scientifique et philosophique suffisante pour comprendre les problématiques au delà de leurs aspects purement techniques, j'ai acquis une familiarité particulière avec des concepts employés en sylviculture, dendrologie et pédologie.</p>
 
-          <h2 class="content-subhead">Compétences</h2>
-<strong>TODO fusionner le tableau de resultat par domaine/par recherche</strong>
+          <h2 class="content-subhead" id="skills">Compétences</h2>
+
+          <h3 class="content-subhead">Par technologie</h3>
+          <form id="tech-search" action="/#tech-search" class="pure-form" method="post" style="margin-bottom: 1em">
+            <input type="text" name="tech-names">
+            <button type="submit" name="search-skill" class="pure-button">Search</button>
+          </form>
+          {{{skill-search-result}}}
+
           <h3 class="content-subhead">Par domaine</h3>
           <div class="pure-g">
             <div class="pure-u-1-3"> {{{skill-type}}} </div>
             <div class="pure-u-2-3"> {{{skill-detail}}} </div>
           </div>
-
-          <h3 class="content-subhead">Par technologie</h3>
-          <form class="pure-form" method="post">
-            <input type="text" name="tech-names">
-            <button type="submit" name="search-skill" class="pure-button">Search</button>
-          </form>
-
-          {{{skill-search-result}}}
 
           <h4  id="mastery" class="content-subhead">Maîtrise</h4>
           <i><p>Ces nombres quelque peu arbitraires donnent une idée de mon niveau de compétence dans une technologie.
@@ -94,10 +97,10 @@
           </i>
 
 
-          <h2 class="content-subhead">Références clients</h2>
+          <h2 class="content-subhead" id="ref-client">Références clients</h2>
           {{{clients}}}
 
-          <h2 class="content-subhead">Expérience</h2>
+          <h2 class="content-subhead" id="experience">Expérience</h2>
           <h3 class="content-subhead">Indépendant</h3>
           {{{freelance}}}
 
