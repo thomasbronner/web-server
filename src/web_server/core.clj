@@ -10,6 +10,7 @@
 
 (def current-lang "fr")
 
+
 (defn read-template  "take a filename (with no extension) and read that file from /resources/templates"  [template-name]
   (slurp (clojure.java.io/resource
            (str "templates/" template-name ".mustache"))))
@@ -21,14 +22,16 @@
 (defn index  "read and render template index.mustache"
   ([lang] (index lang nil))
   ([lang params]
-   ;;    (DEBUG "params" params)
+
+   (DEBUG "params" params)
+
    (let [skill-type-ids    (parse-for-int (get params "skill-type-ids"))
          tech-names        (split-search-string (get params "tech-names"))]
      (render-template (str "index-" lang) {
                                             :education (education-table-html current-lang)
                                             :langages "<strong>TODO</strong>"
                                             :clients client-table-with-logo-html
-                                            :salariat employer-html
+                                            :salariat (employer-html current-lang)
                                             :freelance "<strong>TODO</strong>"
                                             :contact contact-html
 

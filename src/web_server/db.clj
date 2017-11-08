@@ -13,48 +13,54 @@
          :password "cv"
          })
 
-(def contact-rs (jdbc/query db ["select * from cv.id"]))
+(def contact-rs
+  (let [sql "select * from cv.id"]
+    (jdbc/query db [sql])))
 
 (defn rs-education [lang]
   (let [sql (str "select extract(year from \"from\") as \"from\",
-                                  extract(year from \"to\") as \"to\",institution,
-                                  field_" lang " as field,degree
-                                  from cv.education
-                                  order by \"from\" desc")]
+                 extract(year from \"to\") as \"to\",institution,
+                 field_" lang " as field,degree
+                 from cv.education
+                 order by \"from\" desc")]
     (jdbc/query db [sql])))
 
 
-(def rs-clients (jdbc/query db ["select cl.name as name, ct.name as city,cl.logo_png_base64
-                                from cv.client cl
-                                left join cv.city ct using (id_city)
-                                order by 1"]))
+(def rs-clients
+  (let [sql "select cl.name as name, ct.name as city,cl.logo_png_base64
+        from cv.client cl
+        left join cv.city ct using (id_city)
+        order by 1"]
+    (jdbc/query db [sql])))
 
 
-(def rs-salariat (jdbc/query db ["select id_work_experience,
-                                 extract(year from \"from\") as from,
-                                 extract(year from \"to\")as to,
-                                 e.name as employer,e.department as service,c.name as city,s.name as sector
-                                 from cv.work_experience we
-                                 join cv.employer e using (id_employer)
-                                 left join cv.city c using (id_city)
-                                 left join cv.sector s using (id_sector)
-                                 order by \"from\" desc"]))
+(defn rs-salariat [lang]
+  (let [sql (str "select id_work_experience,
+                 extract(year from \"from\") as from,
+                 extract(year from \"to\")as to,
+                 e.name as employer,e.department as service,c.name as city,s.name_" lang " as sector
+                 from cv.work_experience we
+                 join cv.employer e using (id_employer)
+                 left join cv.city c using (id_city)
+                 left join cv.sector s using (id_sector)
+                 order by \"from\" desc")]
+    (jdbc/query db [sql])))
 
-(defn get-tasks "get tasks corresponding to a id_work_experience" [id_work_experience]
-  (map :content_fr(jdbc/query db [(str "select content_fr
-                                       from cv.task
-                                       left join cv.work_experience_task using (id_task)
-                                       where id_work_experience=" id_work_experience)])))
+(defn get-tasks "get tasks corresponding to a id_work_experience" [lang id_work_experience]
+  (let [sql (str "select content_" lang " from cv.task
+                 left join cv.work_experience_task using (id_task)
+                 where id_work_experience=" id_work_experience)]
+    (map (keyword (str "content_" lang)) (jdbc/query db [sql]))))
+
 ;"add corresponding tasks to work experiences"
-(def rs-salariat-tasks
+(defn rs-salariat-tasks [lang]
   (map
-    (fn [l] (conj l {:tasks (get-tasks(:id_work_experience l))}) )
-    rs-salariat))
-
+    (fn [l] (conj l {:tasks (get-tasks lang (:id_work_experience l))}))
+    (rs-salariat lang)))
 
 (defn rs-skill-types [lang]
-  (let [sql (str "select long_name_" lang " as long_name,short_name_" lang " as short_name,relevance from cv.skill_type order by relevance")]
-  (jdbc/query db [sql])))
+  (let [sql (str "select id_skill_type,long_name_" lang " as long_name,short_name_" lang " as short_name,relevance from cv.skill_type order by relevance")]
+    (jdbc/query db [sql])))
 
 (defn rs-skills-of-types "fetch skills correspondint to skill type, support :all keyword" [lang type-ids]
   (if (or (nil? type-ids) (empty? type-ids))

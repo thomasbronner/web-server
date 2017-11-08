@@ -39,5 +39,5 @@
     (clojure.string/split string #" ")))
 
 
-(defn vectorize "put non collection value in vector" [thing] (if (coll? thing) thing [thing]))
+(defn vectorize "put non collection value in vector" [thing] (if (or (coll? thing) (nil? thing)) thing [thing]))
 

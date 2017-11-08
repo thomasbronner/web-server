@@ -5,7 +5,9 @@
     [web-server.util :refer :all]
     [hiccup.core :refer :all]))
 
-
+(def display-selected-skills "display-selected-skills")
+(def select-none-skills "select-none-skills")
+(def select-all-skills "select-all-skills")
 
 (def contact-html
   (let[line (first contact-rs)
@@ -62,12 +64,12 @@
              rs-clients)
            :tbody)))
 
-(def client-table-with-logo [:table {:class "borderless" }client-with-logo-rows])
+(def client-table-with-logo [:table {:class "borderless" } client-with-logo-rows])
 
 (def client-table-with-logo-html (html client-table-with-logo))
 
 ;convert employee result sets to html
-(def employer-rows
+(defn employer-rows [lang]
   (apply vector(conj
                  (map
                    (fn [line]
@@ -80,13 +82,12 @@
                         [:td  (:city line)]
                         [:td [:ul  (map (fn [x] [:li x]) tasks) ]]]
                        ))
-                   rs-salariat-tasks)
+                   (rs-salariat-tasks lang))
                  :tbody )))
 
+(defn employer-table-html [lang] (html [:table {:class "pure-table"} (employer-rows lang)]))
 
-(def employer-table-html (html [:table {:class "pure-table"} employer-rows]))
-
-(def employer-html
+(defn employer-html [lang]
   (apply str
          (map
            (fn [line]
@@ -102,13 +103,9 @@
                  (html [:ul  (map (fn [x] [:li x]) tasks) ])
                  )
                ))
-           rs-salariat-tasks)))
+           (rs-salariat-tasks lang))))
 
 ;skills
-
-(def display-selected-skills "display-selected-skills")
-(def select-none-skills "select-none-skills")
-(def select-all-skills "select-all-skills")
 
 (defn skill-type-form-html "form for hiccup with selected checkboxes as parameters
   lang: language
@@ -122,17 +119,17 @@
                (loop [[line & remain] input
                       result [:fieldset]
                       counter 1]
-                 (let[id (:id_skill_type line)
-                      name- (:short_name line)
-                      tooltip- (:long_name line)
-                      attrib {:type "checkbox" :id (str "name" counter) :name "skill-type-ids" :value id}]
+                 (let [  id       (:id_skill_type line)
+                         name-     (:short_name line)
+                         tooltip-  (:long_name line)
+                         attrib    {:type "checkbox" :id (str "name" counter) :name "skill-type-ids" :value id}]
                    (if (nil? line) ;; put the buttons at the end
                      (if (= lang "en")
                        (-> result
                            (conj [:button {:type "submit" :class "pure-button" :name display-selected-skills } "Display"])
                            (conj [:button {:type "submit" :class "pure-button" :name select-all-skills } "All"])
                            (conj [:button {:type "submit" :class "pure-button" :name select-none-skills } "None"]))
-                        (-> result
+                       (-> result
                            (conj [:button {:type "submit" :class "pure-button" :name display-selected-skills } "Afficher"])
                            (conj [:button {:type "submit" :class "pure-button" :name select-all-skills } "Tout"])
                            (conj [:button {:type "submit" :class "pure-button" :name select-none-skills } "Rien"])))
