@@ -28,21 +28,17 @@
 
       <div id="menu">
         <div class="pure-menu">
-          <!-- 					<a class="pure-menu-heading" href="#">Company</a> -->
-
+              <form id="lang" action="/" method="post" >
+                <input type="image"src="/img/en-us.png" style="width:2em;padding:0;margin:0.5em;" name="lang" value="en" alt="English"></input>
+              </form>
           <ul class="pure-menu-list">
-            <li>TODO english version</li>
-            <li class="pure-menu-item">
-              <a href="#title" class="pure-menu-link">
-                <img src="/img/fr.png" style="width:1.5em; margin-right:1em" alt="Français"/>
-                <img src="/img/en-us.png" style="width:1.5em; margin-right:1em" alt="English"/>
-              </a>
-            </li>
             <li class="pure-menu-item"><a href="#title" class="pure-menu-link">Présentation</a></li>
             <li class="pure-menu-item"><a href="#skills" class="pure-menu-link">Compétences</a></li>
-            <li class="pure-menu-item"><a href="#contact" class="pure-menu-link">Contact</a></li>
             <li class="pure-menu-item"><a href="#ref-client" class="pure-menu-link">Références</a></li>
             <li class="pure-menu-item"><a href="#experience" class="pure-menu-link">Expérience</a></li>
+            <li class="pure-menu-item"><a href="#languages" class="pure-menu-link">Langues</a></li>
+            <li class="pure-menu-item"><a href="#education" class="pure-menu-link">Formation</a></li>
+            <li class="pure-menu-item"><a href="#contact" class="pure-menu-link">Contact</a></li>
           </ul>
         </div>
       </div>
@@ -68,7 +64,7 @@
         </div>
 
         <div class="content">
-          <p>J'étudie tout projet réalisable <strong>en télétravail</strong>, en particulier dans l'informatique scientifique.</p>
+          <p>J'étudie tout projet réalisable <strong>principalement en télétravail</strong>, en particulier dans l'informatique scientifique.</p>
           <p>Outre une culture scientifique et philosophique suffisante pour comprendre les problématiques au delà de leurs aspects purement techniques, j'ai acquis une familiarité particulière avec des concepts employés en sylviculture, dendrologie et pédologie.</p>
 
           <h2 class="content-subhead" id="skills">Compétences</h2>
@@ -76,7 +72,7 @@
           <h3 class="content-subhead">Par technologie</h3>
           <form id="tech-search" action="/#tech-search" class="pure-form" method="post" style="margin-bottom: 1em">
             <input type="text" name="tech-names">
-            <button type="submit" name="search-skill" class="pure-button">Search</button>
+            <button type="submit" name="search-skill" class="pure-button">Rechercher</button>
           </form>
           {{{skill-search-result}}}
 
@@ -107,8 +103,10 @@
           <h3 class="content-subhead">Salarié</h3>
           {{{salariat}}}
 
+          <h2 class="content-subhead" id="languages">Langues</h2>
+          {{{languages}}}
 
-          <h2 class="content-subhead">Formation</h2>
+          <h2 class="content-subhead" id="education">Formation</h2>
           {{{education}}}
 
           <h2 class="content-subhead" id="contact" >Contact</h2>

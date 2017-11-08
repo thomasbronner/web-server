@@ -15,11 +15,13 @@
 
 (def contact-rs (jdbc/query db ["select * from cv.id"]))
 
-(def rs-education (jdbc/query db ["select extract(year from \"from\") as \"from\",
+(defn rs-education [lang]
+  (let [sql (str "select extract(year from \"from\") as \"from\",
                                   extract(year from \"to\") as \"to\",institution,
-                                  field_fr,field_en,degree
+                                  field_" lang " as field,degree
                                   from cv.education
-                                  order by \"from\" desc"]))
+                                  order by \"from\" desc")]
+    (jdbc/query db [sql])))
 
 
 (def rs-clients (jdbc/query db ["select cl.name as name, ct.name as city,cl.logo_png_base64
@@ -50,9 +52,11 @@
     rs-salariat))
 
 
-(def rs-skill-types (jdbc/query db ["select * from cv.skill_type order by relevance"]))
+(defn rs-skill-types [lang]
+  (let [sql (str "select long_name_" lang " as long_name,short_name_" lang " as short_name,relevance from cv.skill_type order by relevance")]
+  (jdbc/query db [sql])))
 
-(defn rs-skills-of-types "fetch skills correspondint to skill type, support :all keyword" [type-ids]
+(defn rs-skills-of-types "fetch skills correspondint to skill type, support :all keyword" [lang type-ids]
   (if (or (nil? type-ids) (empty? type-ids))
     '()
     (let [sql (if  (or (some #(= :all %) type-ids) (and (= 1 (count type-ids)) (nil? (first type-ids))))

@@ -19,19 +19,25 @@
       )))
 
 ; convert education resultset (list of maps) to html table
-(def education-header
+(def education-header-fr
   [:thead [:tr  [:th {:colspan 2 :align :center} "Annee"] [:th "Etablissement"] [:th "Domaine"] [:th "Diplôme"]]])
+(def education-header-en
+  [:thead [:tr  [:th {:colspan 2 :align :center} "Year"] [:th "Institution"] [:th "Field"] [:th "Degree"]]])
 
-(def education-rows
+
+
+(defn education-rows [lang]
   (apply vector
          (conj
            (map
-             (fn [l] [:tr [:td ( int (:from l))] [:td (int (:to l))] [:td (:institution l)] [:td (:field_fr l)] [:td (:degree l)] ])
-             rs-education)
+             (fn [l] [:tr [:td ( int (:from l))] [:td (int (:to l))] [:td (:institution l)] [:td (:field l)] [:td (:degree l)] ])
+             (rs-education lang))
            :tbody)))
 
-(def education-table-html
-  (html [:table {:class "pure-table"} education-header education-rows]))
+(defn education-table-html [lang]
+  (cond
+    (= lang "en") (html [:table {:class "pure-table"} education-header-en (education-rows lang)])
+    :else (html [:table {:class "pure-table"} education-header-fr (education-rows lang)])))
 
 ; convert clients result set to html list
 (def client-list
@@ -105,10 +111,11 @@
 (def select-all-skills "select-all-skills")
 
 (defn skill-type-form-html "form for hiccup with selected checkboxes as parameters
+  lang: language
   ids : skill type ids collection to retain checked checkbox
   all-none : :all to check all checkboxes, :none to uncheck all checkboxes"
-  ([ids] (skill-type-form-html ids nil))
-  ([ids all-none]
+  ([lang ids] (skill-type-form-html lang ids nil))
+  ([lang ids all-none]
    (let [ids (vectorize ids)]
      (html [:form {:class "pure-form pure-form-aligned" :method "post" :action "/#skill-type-form" :id "skill-type-form"}
             ((fn [input]
@@ -116,14 +123,19 @@
                       result [:fieldset]
                       counter 1]
                  (let[id (:id_skill_type line)
-                      name-fr (:short_name_fr line)
-                      tooltip-fr (:long_name_fr line)
+                      name- (:short_name line)
+                      tooltip- (:long_name line)
                       attrib {:type "checkbox" :id (str "name" counter) :name "skill-type-ids" :value id}]
                    (if (nil? line) ;; put the buttons at the end
-                     (-> result
-                         (conj [:button {:type "submit" :class "pure-button" :name display-selected-skills } "Afficher"])
-                         (conj [:button {:type "submit" :class "pure-button" :name select-all-skills } "Tout"])
-                         (conj [:button {:type "submit" :class "pure-button" :name select-none-skills } "Rien"]))
+                     (if (= lang "en")
+                       (-> result
+                           (conj [:button {:type "submit" :class "pure-button" :name display-selected-skills } "Display"])
+                           (conj [:button {:type "submit" :class "pure-button" :name select-all-skills } "All"])
+                           (conj [:button {:type "submit" :class "pure-button" :name select-none-skills } "None"]))
+                        (-> result
+                           (conj [:button {:type "submit" :class "pure-button" :name display-selected-skills } "Afficher"])
+                           (conj [:button {:type "submit" :class "pure-button" :name select-all-skills } "Tout"])
+                           (conj [:button {:type "submit" :class "pure-button" :name select-none-skills } "Rien"])))
                      (recur remain
                             [:div {:class "pure-control-group"}
                              (-> result
@@ -137,21 +149,22 @@
                                      [:input (assoc attrib :checked true)]
                                      [:input attrib]))
                                  ;label for input + tooltip
-                                 (conj [:label {:for (str "name" counter) :class "tooltip" } name-fr (if-not (nil? tooltip-fr) [:span {:class "tooltiptext"} tooltip-fr]) ])
+                                 (conj [:label {:for (str "name" counter) :class "tooltip" } name- (if-not (nil? tooltip- ) [:span {:class "tooltiptext"} tooltip- ]) ])
                                  )]
                             (inc counter)
-                            )
-                     ))))
-             rs-skill-types)]))))
+                            )))))
+             (rs-skill-types lang))]))))
 
-(defn skills-of-types-html "fetch skills corresponding to skill type ids and format for hiccup, accept :all or :none " [ids]
+(defn skills-of-types-html "fetch skills corresponding to skill type ids and format for hiccup, accept :all or :none " [lang ids]
   (if (nil? ids)
     nil
     (let [ids (vectorize ids)]
       (if (or (some #(= :none %) ids) (empty? ids))
         nil
         (html [:table {:class "pure-table"}
-               [:thead [:tr [:th "Technologie"] [:th "Version"] [:th "Maîtrise"[:a {:href "#mastery"} " * "] ] ]]
+               (if (= lang "en")
+                 [:thead [:tr [:th "Technology"] [:th "Version"] [:th "Mastery"[:a {:href "#mastery"} " * "] ] ]]
+                 [:thead [:tr [:th "Technologie"] [:th "Version"] [:th "Maîtrise"[:a {:href "#mastery"} " * "] ] ]])
                [:tbody
                 (map
                   (fn [line]
@@ -160,7 +173,7 @@
                           mastery (:mastery line)]
                       [:tr [:td tech] [:td version] [:td (str mastery " %")] ]
                       ))
-                  (rs-skills-of-types ids))]])))))
+                  (rs-skills-of-types lang ids))]])))))
 
 (defn skills-containing-html "fetch skills corresponding to search keyword and format for hiccup" [keywords]
   (if (or (nil? keywords) (empty? keywords))

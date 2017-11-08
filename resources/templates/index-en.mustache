@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Thomas Bronner's CV">
+    <title>Thomas Bronner, freelance software developer</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-" crossorigin="anonymous">
+
+
+
+    <!--[if lte IE 8]>
+<link rel="stylesheet" href="css/side-menu-old-ie.css">
+<![endif]-->
+    <!--[if gt IE 8]><!-->
+    <link rel="stylesheet" href="/css/side-menu.css">
+    <link rel="stylesheet" href="/css/custom.css">
+    <!--<![endif]-->
+  </head>
+  <body>
+    <div id="layout">
+      <!-- Menu toggle -->
+      <a href="#menu" id="menuLink" class="menu-link">
+        <!-- Hamburger icon -->
+        <span></span>
+      </a>
+
+      <div id="menu">
+        <div class="pure-menu">
+              <form id="lang" action="/" method="post" >
+                <input type="image"src="/img/fr.png" style="width:2em;padding:0;margin:0.5em;" name="lang" value="fr" alt="Français"></input>
+              </form>
+          <ul class="pure-menu-list">
+            <li class="pure-menu-item"><a href="#title" class="pure-menu-link">Introduction</a></li>
+            <li class="pure-menu-item"><a href="#skills" class="pure-menu-link">Skills</a></li>
+            <li class="pure-menu-item"><a href="#ref-client" class="pure-menu-link">Clients</a></li>
+            <li class="pure-menu-item"><a href="#experience" class="pure-menu-link">Experience</a></li>
+            <li class="pure-menu-item"><a href="#languages" class="pure-menu-link">Languages</a></li>
+            <li class="pure-menu-item"><a href="#education" class="pure-menu-link">Education</a></li>
+            <li class="pure-menu-item"><a href="#contact" class="pure-menu-link">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div id="main">
+
+        <div class="header" id="title">
+          <div class="pure-g">
+            <div class="pure-u-1-5">
+              <img src="/img/face.jpg" alt="Smiley face"
+                   style="display: block;
+                          max-width: 40%;
+                          height: auto;S
+                          margin-top: 10px; margin-bottom: 10px;
+                          border-radius: 8px;
+                          box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+            </div>
+            <div class="pure-u-4-5">
+              <h1>Thomas Bronner</h1>
+              <h2>Freelance software developer</h2>
+            </div>
+          </div>
+        </div>
+
+        <div class="content">
+          <p>I will consider any project that can be done <strong> mainly remotely</strong>, especially in scientific computing.</p>
+          <p>In addition to a scientific and philosophical culture sufficient to understand the challenges beyond their purely technical aspects,
+            I have acquired a special familiarity with concepts used in forestry, dendrology and pedology.</p>
+
+          <h2 class="content-subhead" id="skills">Skills</h2>
+
+          <h3 class="content-subhead">By technology</h3>
+          <form id="tech-search" action="/#tech-search" class="pure-form" method="post" style="margin-bottom: 1em">
+            <input type="text" name="tech-names">
+            <button type="submit" name="search-skill" class="pure-button">Search</button>
+          </form>
+          {{{skill-search-result}}}
+
+          <h3 class="content-subhead">By type</h3>
+          <div class="pure-g">
+            <div class="pure-u-1-3"> {{{skill-type}}} </div>
+            <div class="pure-u-2-3"> {{{skill-detail}}} </div>
+          </div>
+
+          <h4  id="mastery" class="content-subhead">Mastery</h4>
+          <i><p>These somewhat arbitrary numbers give an idea of my skill level in a technology.
+            The maximum, 100%, indicates what I can do best and for which I have a solid experience.
+            This does not mean that I have nothing to learn about it. On the contrary!<p>
+            In the same way, when the number is rather close to 0%, it does not necessarily indicate that I am bad with the technology in question.
+            This may indicate a skill that has not been mobilized for a long time and / or in a version that is now obsolete.</p>
+          </i>
+
+          <h2 class="content-subhead" id="ref-client">Clients</h2>
+          {{{clients}}}
+
+          <h2 class="content-subhead" id="experience">Experience</h2>
+          <h3 class="content-subhead">Freelance</h3>
+          {{{freelance}}}
+
+          <h3 class="content-subhead">Employee</h3>
+          {{{salariat}}}
+
+          <h2 class="content-subhead" id="languages">Languages</h2>
+          {{{languages}}}
+
+          <h2 class="content-subhead" id="education">Education</h2>
+          {{{education}}}
+
+          <h2 class="content-subhead" id="contact" >Contact</h2>
+          {{{contact}}}
+
+
+        </div>
+      </div>
+      <script src="js/ui.js"></script>
+      </body>
+    </html>
