@@ -77,4 +77,53 @@
                (fn [key-word] (jdbc/query db [(str "select id_skill,name,version,mastery from cv.skill where lower(name) like '%" (clojure.string/lower-case key-word) "%';")]))
                key-words))))
 
+(defn rs-freelance-tasks "map tasks and work type to work experiences" [lang]
+  (let [work-experiences  (jdbc/query db [(str " select id_project,id_work_experience,
+                                                 extract(year from we.\"from\") ||'-'|| extract(month from we.\"from\")  as \"from\",
+                                                 extract(year from we.\"to\") ||'-'|| extract(month from we.\"to\")  as \"to\"
+                                                 from cv.work_experience we
+                                                 where id_employer is null")])
+
+        tasks             (jdbc/query db [(str " select id_work_experience,content_" lang " as content
+                                                 from cv.work_experience_task
+                                                 left join cv.task t using (id_task)")])
+        work-types        (jdbc/query db [(str " select id_work_experience,wt.name_" lang " as work_type
+                                                 from cv.work_experience_task
+                                                 left join cv.work_experience_work_type using (id_work_experience)
+                                                 left join cv.work_type wt using (id_work_type)")])]
+
+    (->> work-experiences
+         (map (fn [we] (assoc we :tasks (map :content (filter #(= (:id_work_experience %) (:id_work_experience we )) tasks)))) )
+         (map (fn [we] (assoc we :work-types (distinct (map :work_type (filter #(= (:id_work_experience %) (:id_work_experience we )) work-types))) ) ))
+         (map #(dissoc % :id_work_experience)))))
+
+(defn rs-freelance "construct a nested collection for all freelance work experience data" [lang]
+  (let [projects         (jdbc/query db [(str " select distinct id_project,name as project,description_" lang " as description
+                                                from cv.work_experience we
+                                                left join cv.project p using (id_project)
+                                                where id_employer is null
+                                                order by id_project;")])
+        clients          (jdbc/query db [(str " select distinct id_project,c.name as client, ci.name as city,ci.country, s.name_" lang " as sector
+                                                from cv.work_experience we
+                                                left join cv.work_experience_client using (id_work_experience)
+                                                left join cv.project p using (id_project)
+                                                left join cv.client c using (id_client)
+                                                left join cv.city ci using (id_city)
+                                                left join cv.sector s using (id_sector)
+                                                order by id_project")])
+        work-experiences-tasks  (rs-freelance-tasks lang)
+        ids                     (map :id_project projects)]
+
+
+    ;construct main from the project level
+    (loop [  result []
+             [id & ids] ids]
+      (if (nil? id)
+        result
+        (let [ project (dissoc (first (filter #(= id (:id_project %)) projects)) :id_project)
+               clients (filter #(= id (:id_project %)) clients)
+               work-experiences-tasks (map #(dissoc % :id_project) (filter #(= id (:id_project %)) work-experiences-tasks))
+               ]
+          (recur (conj result (assoc project :clients clients :we work-experiences-tasks )) ids ))))))
+
 ;(use 'web-server.util :reload)

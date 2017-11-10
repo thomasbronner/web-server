@@ -75,11 +75,7 @@
                    (fn [line]
                      (let [tasks (:tasks line)]
                        [:tr
-                        [:td  (:from line)]
-                        [:td  (:to line)]
-                        [:td  (:employer line)]
-                        [:td  (:service line)]
-                        [:td  (:city line)]
+                        [:td  (:from line)] [:td  (:to line)] [:td  (:employer line)] [:td  (:service line)] [:td  (:city line)]
                         [:td [:ul  (map (fn [x] [:li x]) tasks) ]]]
                        ))
                    (rs-salariat-tasks lang))
@@ -105,8 +101,40 @@
                ))
            (rs-salariat-tasks lang))))
 
-;skills
+;freelance resultset to html
+(defn freelance-element [lang e]
+  (list
+    [:h4 (if (= lang "en") "Project " "Projet ") (:project e) ]
+    [:p (:description e)]
+    [:p "Clients : " (clojure.string/join ", " (map :client (:clients e)))]
 
+    (map
+      (fn [we]
+        (list
+          [:h5 (str (:from we) " => " (:to we)) " (" (clojure.string/join "/" (:work-types we)) ")" ]
+          ;;[:p (if (= lang "en") "Tasks" "Tâches")]
+          [:ul (map #(vector :li %) (:tasks we))]
+        ))(:we e))
+))
+
+
+;(freelance-element "fr" (first (rs-freelance "fr")))
+;(first (rs-freelance "fr"))
+
+(defn freelance-html [lang]
+  (let [ html-strings (map
+                        #(html %)
+                        (loop [[line & remaining-lines ] (rs-freelance lang)
+                               result '()]
+                          (if (nil? line)
+                            result
+                            (recur remaining-lines (conj result (freelance-element lang line) )  ))))]
+
+ (eval(conj html-strings (symbol "str")))));;an attempt in clojure code generation + evaluation
+
+;(freelance-html "fr")
+
+;skills
 (defn skill-type-form-html "form for hiccup with selected checkboxes as parameters
   lang: language
   ids : skill type ids collection to retain checked checkbox

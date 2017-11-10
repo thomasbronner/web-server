@@ -29,10 +29,10 @@
          tech-names        (split-search-string (get params "tech-names"))]
      (render-template (str "index-" lang) {
                                             :education (education-table-html current-lang)
-                                            :langages "<strong>TODO</strong>"
+                                            :languages "<strong>TODO</strong>"
                                             :clients client-table-with-logo-html
                                             :salariat (employer-html current-lang)
-                                            :freelance "<strong>TODO</strong>"
+                                            :freelance (str "<strong>TODO corriger les merdes</strong>" (freelance-html current-lang))
                                             :contact contact-html
 
                                             :skill-type (cond ;relay the button used to the form generating function
