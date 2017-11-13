@@ -38,3 +38,7 @@
 .tooltip:hover .tooltiptext {
     visibility: visible;
 }
+
+h5.content-subhead {
+  margin-top: 1em;
+}

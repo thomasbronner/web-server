@@ -23,16 +23,17 @@
   ([lang] (index lang nil))
   ([lang params]
 
-   (DEBUG "params" params)
+;;    (DEBUG "params" params)
 
    (let [skill-type-ids    (parse-for-int (get params "skill-type-ids"))
          tech-names        (split-search-string (get params "tech-names"))]
      (render-template (str "index-" lang) {
                                             :education (education-table-html current-lang)
-                                            :languages "<strong>TODO</strong>"
+                                            :languages (lang-html current-lang)
                                             :clients client-table-with-logo-html
                                             :salariat (employer-html current-lang)
-                                            :freelance (str "<strong>TODO corriger les merdes</strong>" (freelance-html current-lang))
+                                            :freelance (freelance-html current-lang)
+                                            :perso (perso-html current-lang)
                                             :contact contact-html
 
                                             :skill-type (cond ;relay the button used to the form generating function
@@ -45,7 +46,7 @@
                                                             (contains? params select-none-skills) (skills-of-types-html current-lang :none)
                                                             :else (skills-of-types-html current-lang skill-type-ids))
 
-                                            :skill-search-result (skills-containing-html tech-names)
+                                            :skill-search-result (skills-containing-html current-lang tech-names)
                                             }))))
 
 

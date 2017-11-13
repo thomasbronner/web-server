@@ -8,6 +8,7 @@
 (def display-selected-skills "display-selected-skills")
 (def select-none-skills "select-none-skills")
 (def select-all-skills "select-all-skills")
+(def right-arrow-html " &#8594; ")
 
 (def contact-html
   (let[line (first contact-rs)
@@ -87,52 +88,70 @@
   (apply str
          (map
            (fn [line]
-             (let [       tasks (:tasks line)
-                          from  (int (:from line))
-                          to (int (:to line))
+             (let [       tasks    (:tasks line)
+                          from     (int (:from line))
+                          to       (int (:to line))
                           employer (:employer line)
-                          service (if-not (nil? (:service line)) (str " " (:service line)))
-                          city (if-not (nil? (:city line)) (str ", " (:city line)))
+                          service  (if-not (nil? (:service line)) (str " " (:service line)))
+                          city     (if-not (nil? (:city line)) (str ", " (:city line)))
                           ]
                (str
                  (html [:h4 {:class "content-subhead"} (str from "-" to " " employer service city)])
-                 (html [:ul  (map (fn [x] [:li x]) tasks) ])
-                 )
+                 (html [:ul (map (fn [x] [:li x]) tasks ) ]))
                ))
            (rs-salariat-tasks lang))))
+
+(employer-html "fr")
 
 ;freelance resultset to html
 (defn freelance-element [lang e]
   (list
-    [:h4 (if (= lang "en") "Project " "Projet ") (:project e) ]
+    [:h4 {:class "content-subhead"} (if (= lang "en") "Project " "Projet ") (:project e) ]
     [:p (:description e)]
     [:p "Clients : " (clojure.string/join ", " (map :client (:clients e)))]
 
     (map
       (fn [we]
         (list
-          [:h5 (str (:from we) " => " (:to we)) " (" (clojure.string/join "/" (:work-types we)) ")" ]
+          [:h5 {:class "content-subhead"} (str (:from we) right-arrow-html (:to we)) " (" (clojure.string/join "/" (:work-types we)) ")" ]
           ;;[:p (if (= lang "en") "Tasks" "Tâches")]
           [:ul (map #(vector :li %) (:tasks we))]
         ))(:we e))
 ))
 
-
-;(freelance-element "fr" (first (rs-freelance "fr")))
-;(first (rs-freelance "fr"))
-
 (defn freelance-html [lang]
-  (let [ html-strings (map
+  (let [ html-strings (reverse(map
                         #(html %)
                         (loop [[line & remaining-lines ] (rs-freelance lang)
                                result '()]
                           (if (nil? line)
                             result
-                            (recur remaining-lines (conj result (freelance-element lang line) )  ))))]
+                            (recur remaining-lines (conj result (freelance-element lang line) )  )))))]
 
  (eval(conj html-strings (symbol "str")))));;an attempt in clojure code generation + evaluation
 
-;(freelance-html "fr")
+
+;;personal projects
+(defn perso-html [lang]
+  (let [rs (rs-perso lang)
+        by-ids (vals(group-by :id_project rs)) ]
+    (html
+      (map
+        (fn [p]
+          (let [project     (distinct(map #( :project %) p))
+                description (distinct(map #( :description %) p))
+                from-to     (distinct(map #( str (:from %) right-arrow-html (:to %)) p))
+                tasks       (distinct(map #( :task %) p))
+                skills       (distinct(map #( :skill %) p))]
+            (list
+              [:h4 {:class "content-subhead"} project ]
+              [:p description]
+              [:h5 {:class "content-subhead"} from-to ]
+              [:ul (map #(vector :li %) tasks)]
+              [:p (str "Techs : " (clojure.string/join "/" skills))]
+              )
+            ))
+        by-ids))))
 
 ;skills
 (defn skill-type-form-html "form for hiccup with selected checkboxes as parameters
@@ -200,11 +219,13 @@
                       ))
                   (rs-skills-of-types lang ids))]])))))
 
-(defn skills-containing-html "fetch skills corresponding to search keyword and format for hiccup" [keywords]
+(defn skills-containing-html "fetch skills corresponding to search keyword and format for hiccup" [lang keywords]
   (if (or (nil? keywords) (empty? keywords))
     nil
     (html [:table {:class "pure-table"}
-           [:thead [:tr [:th "Technologie"] [:th "Version"] [:th "Maîtrise"[:a {:href "#mastery"} " * "] ] ]]
+            (if (= lang "en")
+                 [:thead [:tr [:th "Technology"] [:th "Version"] [:th "Mastery"[:a {:href "#mastery"} " * "] ] ]]
+                 [:thead [:tr [:th "Technologie"] [:th "Version"] [:th "Maîtrise"[:a {:href "#mastery"} " * "] ] ]])
            [:tbody
             (map
               (fn [line]
@@ -214,6 +235,14 @@
                   [:tr [:td tech] [:td version] [:td (str mastery " %")] ]
                   ))
               (rs-skills-containing keywords))]])))
+
+(defn lang-html [lang]
+  (let [rs (rs-lang lang)]
+  (html
+    (map (fn [l] [:p (str (:name l) " : " (:proficiency l) )] ) rs))
+  ))
+
+
 
 ;(use 'web-server.db :reload)
 ;(use 'web-server.util :reload)
