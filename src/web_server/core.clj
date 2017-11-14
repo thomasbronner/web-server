@@ -22,9 +22,6 @@
 (defn index  "read and render template index.mustache"
   ([lang] (index lang nil))
   ([lang params]
-
-;;    (DEBUG "params" params)
-
    (let [skill-type-ids    (parse-for-int (get params "skill-type-ids"))
          tech-names        (split-search-string (get params "tech-names"))]
      (render-template (str "index-" lang) {
@@ -62,7 +59,8 @@
   (not-found "404 Not Found"))
 
 
-;(defn -main []  (run-jetty webapp {:port 8080 :join? false})) ; :join? false => give back repl prompt
+;;(defn -main []  (run-jetty webapp {:port 54130 :join? false})) ; :join? false => give back repl prompt
+(defn -main []  (run-jetty webapp {:port 54130}))
 ; def the server once and for all, start/stop with (.start server) / (.stop server)
 ; :join?                - blocks the thread until server ends (defaults to true)
 ; Var-quote (#') #'x = (var x)  => getting meta-data for a defined symbol (as opposed to what it's pointing to.)

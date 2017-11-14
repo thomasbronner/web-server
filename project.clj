@@ -1,6 +1,6 @@
-(defproject web-server "0.1.0-SNAPSHOT"
-  :description "FIXME: write description"
-  :url "http://example.com/FIXME"
+(defproject web-server "1.0.0"
+  :description "A small customised web server"
+  :url "http://thomasbronner.hd.free.fr"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.8.0"]
